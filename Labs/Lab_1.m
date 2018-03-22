@@ -1,9 +1,10 @@
-eps = 0.01;
+eps = 0.0001;
 a = 0;
 b = 1;
 %[xRes, fRes, xi, fi, iterCount] = BitwiseSearch(a,b, eps);
 % [xRes, fRes, xi, fi, iterCount] = GoldenSection(a,b, eps);
-[xRes, fRes, xi, fi, iterCount] = ParabolasMethod(a,b, eps);
+%[xRes, fRes, xi, fi, iterCount] = ParabolasMethod(a,b, eps);
+[xRes, fRes, xi, fi, iterCount] = NewtonMethod(a,b, eps);
 
 %Получение данных для построения графика целевой функции
 xArr = zeros(1,iterCount);
@@ -196,10 +197,15 @@ dx = 0;
 iter = 0;
 while(dx < eps)
     iter = iter + 1;
-    x1 = x0 - diff(x0)/diff(x0,2);
+    res1 = DX(x0);  
+    res2 = D2X(x0);
+    
+    x1 = x0 - res1/res2;
     dx = abs(x1 - x0);
     x0 = x1;
-    if(diff(x1,2) > 0)
+    
+    difff = D2X(x1);
+    if( difff < 0)
         break;
     end
     xi(iter) = x1;
@@ -210,4 +216,22 @@ xI = xi;
 fI = fi;
 xResult = x1;
 fResult = Func(xResult);
+end
+
+function value = DX(pointX)
+syms x;
+f = cosh((3*(x^3)+2*(x^2)-4*x+5)/3)+tanh((x^3-3*sqrt(2)*x-2)/(2*x+sqrt(2)))-2.5;
+F = diff(f);
+str1 = char(F);
+x = pointX;
+value=eval(str1);
+end
+
+function value = D2X(pointX)
+syms x;
+f = cosh((3*(x^3)+2*(x^2)-4*x+5)/3)+tanh((x^3-3*sqrt(2)*x-2)/(2*x+sqrt(2)))-2.5;
+F = diff(f,2);
+str1 = char(F);
+x = pointX;
+value=eval(str1);
 end
