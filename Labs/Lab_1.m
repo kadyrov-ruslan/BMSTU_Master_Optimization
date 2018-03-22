@@ -178,3 +178,36 @@ fI = fi;
 xResult = xMin;
 fResult = Func(xResult);
 end
+
+%Метод Ньютона
+function [xResult, fResult, xI,fI, iterationCount] = NewtonMethod(a, b, eps)
+% a - начало отрезка, b - конец отрезка, eps - эпсилон, точность поиска
+% xResult - оптимальный x*, %fResult - значение целевой функции в x*
+% xI-последовательность xi, приближающих точку искомого минимума
+% fI-последовательность fi, приближающих точку искомого минимума
+% iterationCount - число вычислений значения целевой функции
+
+xi = zeros(1,50);
+fi = zeros(1,50);
+
+x0 = a;
+x1 = 0;
+dx = 0;
+iter = 0;
+while(dx < eps)
+    iter = iter + 1;
+    x1 = x0 - diff(x0)/diff(x0,2);
+    dx = abs(x1 - x0);
+    x0 = x1;
+    if(diff(x1,2) > 0)
+        break;
+    end
+    xi(iter) = x1;
+    fi(iter) = Func(x1);
+end
+iterationCount = iter;
+xI = xi;
+fI = fi;
+xResult = x1;
+fResult = Func(xResult);
+end
