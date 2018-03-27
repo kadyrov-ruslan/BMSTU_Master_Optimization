@@ -1,8 +1,8 @@
-eps = 0.0001;
+eps = 0.01;
 a = 0;
 b = 1;
 %[xRes, fRes, xi, fi, iterCount] = BitwiseSearch(a,b, eps);
-% [xRes, fRes, xi, fi, iterCount] = GoldenSection(a,b, eps);
+%[xRes, fRes, xi, fi, iterCount] = GoldenSection(a,b, eps);
 %[xRes, fRes, xi, fi, iterCount] = ParabolasMethod(a,b, eps);
 [xRes, fRes, xi, fi, iterCount] = NewtonMethod(a,b, eps);
 
@@ -113,27 +113,31 @@ function [xResult, fResult, xI,fI, iterationCount] = GoldenSection(a, b, eps)
 xi = zeros(1,50);
 fi = zeros(1,50);
 phi = (1 + sqrt(5)) / 2;
-resphi = 2 - phi;
 
-x1 = a + resphi * (b - a);
-x2 = b - resphi * (b - a);
+x1 = b - (b - a)/phi;
+x2 = a + (b - a)/phi;
+xi(1) = x1;
+xi(2) = x2;
+
 f1 = Func(x1);
 f2 = Func(x2);
+fi(1) = f1;
+fi(2) = f2;
 
-iter = 0;
+iter = 2;
 while(abs(b - a) > eps)
     iter = iter + 1;
     if(f1 < f2)
         b = x2;
         x2 = x1;
         f2 = f1;
-        x1 = a + resphi * (b - a);
+        x1 = a + (b - a)/phi;
         f1 = Func(x1);
     else
-        a = x2;
+        a = x1;
         x1 = x2;
         f1 = f2;
-        x2 = b - resphi * (b -a);
+        x2 = b - (b - a)/phi;
         f2 = Func(x2);
     end
     xi(iter) = (x1 + x2)/2;
@@ -173,7 +177,7 @@ while(true)
     xi(iter) = xMin;
     fi(iter) = Func(xMin);
 end
-iterationCount = iter;
+iterationCount = iter - 1;
 xI = xi;
 fI = fi;
 xResult = xMin;
@@ -197,7 +201,7 @@ dx = 0;
 iter = 0;
 while(dx < eps)
     iter = iter + 1;
-    res1 = DX(x0);  
+    res1 = DX(x0);
     res2 = D2X(x0);
     
     x1 = x0 - res1/res2;
