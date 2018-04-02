@@ -1,10 +1,10 @@
-eps = 0.01;
+eps = 0.0001;
 a = 0;
 b = 1;
-%[xRes, fRes, xi, fi, iterCount] = BitwiseSearch(a,b, eps);
+[xRes, fRes, xi, fi, iterCount] = BitwiseSearch(a,b, eps);
 %[xRes, fRes, xi, fi, iterCount] = GoldenSection(a,b, eps);
 %[xRes, fRes, xi, fi, iterCount] = ParabolasMethod(a,b, eps);
-[xRes, fRes, xi, fi, iterCount] = NewtonMethod(a,b, eps);
+%[xRes, fRes, xi, fi, iterCount] = NewtonMethod(a,b, eps);
 
 %ѕолучение данных дл€ построени€ графика целевой функции
 xArr = zeros(1,iterCount);
@@ -22,7 +22,7 @@ xiArr = zeros(1,iterCount);
 fiArr = zeros(1,iterCount);
 
 step = 1;
-for i=1:50
+for i=1:MaxIterationCount()
     if(xi(i)~=0)
         xiArr(step) = xi(i);
         fiArr(step) = fi(i);
@@ -57,8 +57,8 @@ function [xResult, fResult, xI,fI, iterationCount] = BitwiseSearch(a, b, eps)
 % fI-последовательность fi, приближающих точку искомого минимума
 % iterationCount - число вычислений значени€ целевой функции
 
-xi = zeros(1,50);
-fi = zeros(1,50);
+xi = zeros(1,MaxIterationCount());
+fi = zeros(1,MaxIterationCount());
 
 delta = (b - a)/4;
 x0 = a;
@@ -110,8 +110,8 @@ function [xResult, fResult, xI,fI, iterationCount] = GoldenSection(a, b, eps)
 % fI-последовательность fi, приближающих точку искомого минимума
 % iterationCount - число вычислений значени€ целевой функции
 
-xi = zeros(1,50);
-fi = zeros(1,50);
+xi = zeros(1,MaxIterationCount());
+fi = zeros(1,MaxIterationCount());
 phi = (1 + sqrt(5)) / 2;
 
 x1 = b - (b - a)/phi;
@@ -158,8 +158,8 @@ function [xResult, fResult, xI,fI, iterationCount] = ParabolasMethod(a, b, eps)
 % fI-последовательность fi, приближающих точку искомого минимума
 % iterationCount - число вычислений значени€ целевой функции
 
-xi = zeros(1,50);
-fi = zeros(1,50);
+xi = zeros(1,MaxIterationCount());
+fi = zeros(1,MaxIterationCount());
 
 xCenter = (b - a)/2;
 step = 0.001*xCenter;
@@ -192,8 +192,8 @@ function [xResult, fResult, xI,fI, iterationCount] = NewtonMethod(a, b, eps)
 % fI-последовательность fi, приближающих точку искомого минимума
 % iterationCount - число вычислений значени€ целевой функции
 
-xi = zeros(1,50);
-fi = zeros(1,50);
+xi = zeros(1,MaxIterationCount());
+fi = zeros(1,MaxIterationCount());
 
 x0 = a;
 x1 = 0;
@@ -238,4 +238,8 @@ F = diff(f,2);
 str1 = char(F);
 x = pointX;
 value=eval(str1);
+end
+
+function num = MaxIterationCount
+num = 150;
 end
