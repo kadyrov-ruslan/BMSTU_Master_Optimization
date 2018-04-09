@@ -1,10 +1,9 @@
-eps = 0.000001;
+eps = 0.01;
 a = 0;
 b = 1;
 %[xRes, fRes, xi, fi, iterCount] = BitwiseSearch(a,b, eps);
-%[xRes, fRes, xi, fi, iterCount] = GoldenSection(a,b, eps);
-[xRes, fRes, xi, fi, iterCount] = ParabolasMethod(a,b, eps);
-%[xRes, fRes, xi, fi, iterCount] = NewtonMethod(a,b, eps);
+[xRes, fRes, xi, fi, iterCount] = GoldenSection(a,b, eps);
+%[xRes, fRes, xi, fi, iterCount] = ParabolasMethod(a,b, eps);
 
 %Получение данных для построения графика целевой функции
 xArr = zeros(1,iterCount);
@@ -192,62 +191,6 @@ xI = xi;
 fI = fi;
 xResult = xMin;
 fResult = Func(xResult);
-end
-
-%Метод Ньютона
-function [xResult, fResult, xI,fI, iterationCount] = NewtonMethod(a, b, eps)
-% a - начало отрезка, b - конец отрезка, eps - эпсилон, точность поиска
-% xResult - оптимальный x*, %fResult - значение целевой функции в x*
-% xI-последовательность xi, приближающих точку искомого минимума
-% fI-последовательность fi, приближающих точку искомого минимума
-% iterationCount - число вычислений значения целевой функции
-
-xi = zeros(1,MaxIterationCount());
-fi = zeros(1,MaxIterationCount());
-
-x0 = a;
-x1 = 0;
-dx = 0;
-iter = 0;
-while(dx < eps)
-    iter = iter + 1;
-    res1 = DX(x0);
-    res2 = D2X(x0);
-    
-    x1 = x0 - res1/res2;
-    dx = abs(x1 - x0);
-    x0 = x1;
-    
-    difff = D2X(x1);
-    if( difff < 0)
-        break;
-    end
-    xi(iter) = x1;
-    fi(iter) = Func(x1);
-end
-iterationCount = iter;
-xI = xi;
-fI = fi;
-xResult = x1;
-fResult = Func(xResult);
-end
-
-function value = DX(pointX)
-syms x;
-f = cosh((3*(x^3)+2*(x^2)-4*x+5)/3)+tanh((x^3-3*sqrt(2)*x-2)/(2*x+sqrt(2)))-2.5;
-F = diff(f);
-str1 = char(F);
-x = pointX;
-value=eval(str1);
-end
-
-function value = D2X(pointX)
-syms x;
-f = cosh((3*(x^3)+2*(x^2)-4*x+5)/3)+tanh((x^3-3*sqrt(2)*x-2)/(2*x+sqrt(2)))-2.5;
-F = diff(f,2);
-str1 = char(F);
-x = pointX;
-value=eval(str1);
 end
 
 function num = MaxIterationCount
