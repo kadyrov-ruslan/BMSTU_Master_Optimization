@@ -1,9 +1,9 @@
-eps = 0.000001;
+eps = 1e-6;
 a = 0;
 b = 1;
-FuncString = 'cosh((3*(x^3) + 2*(x^2) - 4*x + 5)/3) + tanh((x^3 - 3*sqrt(2)*x -2)/(2*x + sqrt(2))) - 2.5;'
-
-[xRes, fRes, xi, fi, iterCount] = NewtonMethod(FuncString,a,b, eps);
+%FuncString = 'cosh((3*(x^3) + 2*(x^2) - 4*x + 5)/3) + tanh((x^3 - 3*sqrt(2)*x -2)/(2*x + sqrt(2))) - 2.5;'
+FuncString = '(cosh(x-0.111))^2;'
+[xRes, fRes, xi, fi, iterCount] = newton(FuncString,a,b, eps);
 
 %Получение данных для построения графика целевой функции
 xArr = zeros(1,iterCount);
@@ -98,6 +98,54 @@ function [xResult, fResult, xI, fI, iterCount, iterOverflow] = StandartFunc(Func
 iterCount = output.funcCount;
 xI = zeros(0, MaxIterationCount());
 fI = zeros(0, MaxIterationCount());
+end
+
+% Метод Ньютона
+function [xResult, fResult, xI, fI, iterCount] = newton(FuncString, a, b, eps)
+iterCount = 0;
+xI = zeros(0, MaxIterationCount());
+fI = zeros(0, MaxIterationCount());
+inlineFunc = inline(FuncString);
+
+df = derivativeRightDiff(FuncString, a, b, 0.00001);
+ddf = derivativeRightDiff(df, a, b, 0.00001);
+
+dfun = str2func(['@(x)', df]);
+ddfun = str2func(['@(x)', ddf]);
+
+if (inlineFunc(a) * ddfun(a) > 0)
+    xResult = b;
+else
+    xResult = a;
+end
+
+while (abs(dfun(xResult)) > eps)
+    iterCount = iterCount + 1;
+    X0 = xResult;
+    xI(iterCount) = X0 - (dfun(X0)/(ddfun(X0)));
+    fI(iterCount) = inlineFunc(xResult);
+    xResult =  xI(iterCount);
+    fResult = fI(iterCount);
+end
+end
+
+function [symdif] = derivativeRightDiff(symfun, start, ending, step)
+symdif = ''; % полиноминальная функция производной (в строковом представлении)
+n = 10; % степень полинома аппроксимирующей ф-ции
+xi = start:step:ending; % входные значения
+xI = xi(1:length(xi)-1);
+fun = str2func(['@(x)', symfun]);
+dy = zeros(0, length(xi));
+for i=1:length(xI)
+    dy(i)=(fun(xi(i+1))-fun(xi(i)))/step;
+end
+p = polyfit(xI,dy,n); % аппроксимация полиномом степени n
+for i=1:length(p)
+    symdif = strcat(symdif, num2str(p(i)), '*x^', num2str(length(p) - i));
+    if i ~= length(p)
+        symdif = strcat(symdif, '+');
+    end
+end
 end
 
 function num = MaxIterationCount
