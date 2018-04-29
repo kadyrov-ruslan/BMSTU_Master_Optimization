@@ -2,7 +2,7 @@ eps = 1e-6;
 a = 0;
 b = 1;
 %FuncString = 'cosh((3*(x^3) + 2*(x^2) - 4*x + 5)/3) + tanh((x^3 - 3*sqrt(2)*x -2)/(2*x + sqrt(2))) - 2.5;'
-FuncString = '(cosh(x-0.111))^2;'
+FuncString = '(cosh(x-0.111))^8;'
 [xRes, fRes, xi, fi, iterCount] = newton(FuncString,a,b, eps);
 
 %Получение данных для построения графика целевой функции
@@ -40,6 +40,7 @@ fprintf('Решение с помощью стандартной функции fminbnd \n');
 fprintf('Количество вычислений целевой функции: %1.d.\n',iterCount);
 fprintf('x* = %1.10f.\n',xRes);
 fprintf('f(x*) = %1.10f.\n',fRes);
+xRes - 0.111
 
 plot(xArr, fArr,xRes, fRes, 'ro',xI_Arr,fI_Arr,'k*');
 grid on;
@@ -53,8 +54,8 @@ function X = Func(x)
 % firstPart = cosh((3*(x^3) + 2*(x^2) - 4*x + 5)/3);
 % secondPart = tanh((x^3 - 3*sqrt(2)*x -2)/(2*x + sqrt(2)));
 % X = firstPart + secondPart - 2.5;
-X = cosh((3*(x^3)+2*(x^2)-4*x+5)/3)+tanh((x^3-3*sqrt(2)*x-2)/(2*x+sqrt(2)))-2.5;
-%X = (cosh(x-0.111))^2;
+%X = cosh((3*(x^3)+2*(x^2)-4*x+5)/3)+tanh((x^3-3*sqrt(2)*x-2)/(2*x+sqrt(2)))-2.5;
+X = (cosh(x-0.111))^8;
 end
 
 %Метод Ньютона
@@ -107,26 +108,26 @@ xI = zeros(0, MaxIterationCount());
 fI = zeros(0, MaxIterationCount());
 inlineFunc = inline(FuncString);
 
-df = derivativeRightDiff(FuncString, a, b, 0.00001);
-ddf = derivativeRightDiff(df, a, b, 0.00001);
+xResult = (a + b) / 2;
 
-dfun = str2func(['@(x)', df]);
-ddfun = str2func(['@(x)', ddf]);
-
-if (inlineFunc(a) * ddfun(a) > 0)
-    xResult = b;
-else
-    xResult = a;
-end
-
-while (abs(dfun(xResult)) > eps)
+while (abs(funcDiff1(FuncString, xResult, eps)) > eps)
     iterCount = iterCount + 1;
     X0 = xResult;
-    xI(iterCount) = X0 - (dfun(X0)/(ddfun(X0)));
+    xI(iterCount) = X0 - (funcDiff1(FuncString, X0, eps)/(funcDiff2(FuncString, X0, eps)));
     fI(iterCount) = inlineFunc(xResult);
     xResult =  xI(iterCount);
     fResult = fI(iterCount);
 end
+end
+
+function [value] = funcDiff1(FuncString, x, eps)
+    inlineFunc = inline(FuncString);
+    value = (inlineFunc(x + eps/2) - inlineFunc(x-eps/2)) / eps;
+end 
+
+function [value] = funcDiff2(FuncString, x, eps) 
+    inlineFunc = inline(FuncString);
+    value = (inlineFunc(x + eps) - 2 * inlineFunc(x) + inlineFunc(x - eps)) / eps / eps;
 end
 
 function [symdif] = derivativeRightDiff(symfun, start, ending, step)
